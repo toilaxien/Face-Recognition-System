@@ -35,7 +35,7 @@ python app.py
 
 2. Open your web browser and navigate to:
 ```
-http://localhost:8000
+http://127.0.0.1:8000
 ```
 
 ## Usage
