@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Face Recognition System</title>
+    <link rel="stylesheet" href="/ui/style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-expand"></i>
+                <h2>FaceID Pro</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-tab="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="nav-item" data-tab="camera">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>Live Attendance</span>
+                    </li>
+                    <li class="nav-item" data-tab="users">
+                        <i class="fa-solid fa-users"></i>
+                        <span>User Management</span>
+                    </li>
+                    <li class="nav-item" data-tab="logs">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Attendance Logs</span>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p>System v1.0</p>
+                <span id="ws-status" class="status-badge disconnected">Disconnected</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- TAB: Dashboard -->
+            <section id="tab-dashboard" class="tab-content active">
+                <header class="content-header">
+                    <h1>Dashboard Overview</h1>
+                    <p>Real-time system statistics and today's summary.</p>
+                </header>
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Employees</h3>
+                            <p id="dash-total-users">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="stat-info">
+                            <h3>Check-ins Today</h3>
+                            <p id="dash-checkins">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon"><i class="fa-solid fa-user-clock"></i></div>
+                        <div class="stat-info">
+                            <h3>Check-outs Today</h3>
+                            <p id="dash-checkouts">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="recent-logs-container glass-panel mt-2">
+                    <h2>Recent Activity Today</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Confidence</th>
+                                <th>Photo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-recent-logs">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB: Live Camera (Kiosk Mode) -->
+            <section id="tab-camera" class="tab-content kiosk-mode">
+                <div class="kiosk-layout">
+                    <!-- Left: Camera -->
+                    <div class="kiosk-camera">
+                        <video id="videoElement" autoplay playsinline></video>
+                        <canvas id="overlayCanvas"></canvas>
+                        <canvas id="captureCanvas" style="display:none;"></canvas>
+                        
+                        <div class="camera-controls-overlay">
+                            <button id="btn-start" class="btn success-btn"><i class="fa-solid fa-play"></i> Start System</button>
+                            <button id="btn-stop" class="btn danger-btn" disabled><i class="fa-solid fa-stop"></i> Stop</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Info Card -->
+                    <div class="kiosk-info">
+                        <div id="kiosk-card" class="kiosk-card empty">
+                            <div class="kiosk-card-placeholder">
+                                <i class="fa-solid fa-face-viewfinder"></i>
+                                <h2>Please stand in front of the camera</h2>
+                            </div>
+                            <div class="kiosk-card-content">
+                                <div class="kiosk-images">
+                                    <div class="img-box">
+                                        <span>Registered</span>
+                                        <img id="kiosk-img-reg" src="" alt="Registered">
+                                    </div>
+                                    <div class="img-box">
+                                        <span>Captured</span>
+                                        <img id="kiosk-img-cap" src="" alt="Captured">
+                                    </div>
+                                </div>
+                                <h1 id="kiosk-name">JOHN DOE</h1>
+                                <h2 id="kiosk-id">EMP-1234</h2>
+                                <div class="kiosk-status-row">
+                                    <span id="kiosk-status" class="status-badge kiosk-badge status-Check-in">Check-in</span>
+                                    <span id="kiosk-time">08:00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: User Management -->
+            <section id="tab-users" class="tab-content">
+                <header class="content-header flex-between">
+                    <div>
+                        <h1>User Management</h1>
+                        <p>Manage employees and students enrolled in the system.</p>
+                    </div>
+                    <button id="btn-show-register" class="btn primary-btn"><i class="fa-solid fa-plus"></i> Add New User</button>
+                </header>
+                <div class="glass-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>DB ID</th>
+                                <th>Student/Emp ID</th>
+                                <th>Full Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB: Attendance Logs -->
+            <section id="tab-logs" class="tab-content">
+                <header class="content-header flex-between">
+                    <div>
+                        <h1>All Attendance Logs</h1>
+                        <p>Complete historical records of all check-ins and check-outs.</p>
+                    </div>
+                    <button id="btn-refresh-logs" class="btn secondary-btn"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+                </header>
+                <div class="glass-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Confidence</th>
+                                <th>Photo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-logs-body">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Register New User</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="student_id">Student/Employee ID:</label>
+                    <input type="text" id="student_id" name="student_id" placeholder="e.g. EMP001" required>
+                </div>
+                <div class="form-group">
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" name="name" placeholder="e.g. John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="file">Face Image (Clear, single face):</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="file" name="file" accept="image/*" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn primary-btn w-100 mt-2">Submit & Extract Face</button>
+                <div id="register-msg" class="msg"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content glass-panel" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Employee Profile & Attendance History</h2>
+                <span class="close-profile close">&times;</span>
+            </div>
+            <div class="profile-layout">
+                <div class="profile-sidebar">
+                    <img id="prof-img" src="" alt="User" class="prof-img">
+                    <h3 id="prof-name">Name</h3>
+                    <p id="prof-id">ID</p>
+                    <div class="prof-stats">
+                        <div class="p-stat"><span>Check-ins</span><strong id="prof-checkins">0</strong></div>
+                        <div class="p-stat"><span>Check-outs</span><strong id="prof-checkouts">0</strong></div>
+                        <div class="p-stat"><span>Status</span><strong id="prof-status">None</strong></div>
+                    </div>
+                </div>
+                <div class="profile-logs">
+                    <h3>Detailed History</h3>
+                    <div style="overflow-y:auto; max-height:400px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Captured Image</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prof-logs-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/ui/script.js?v=4"></script>
+</body>
+</html>

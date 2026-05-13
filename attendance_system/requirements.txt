@@ -1,0 +1,14 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+websockets==12.0
+python-multipart==0.0.6
+torch
+torchvision
+timm
+opencv-python
+numpy
+Pillow
+SQLAlchemy>=2.0.30
+facenet-pytorch
+pydantic
+pydantic-settings
